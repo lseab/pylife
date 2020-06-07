@@ -6,10 +6,11 @@ If a box is alive:
 """
 
 import tkinter as tk
+from presets import Presets
 
 
 class GameOfLife(tk.Tk):
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.game_started = False
@@ -25,12 +26,26 @@ class GameOfLife(tk.Tk):
         play_btn.grid(row=0, column=0, padx=10)
         stop_btn = tk.Button(controls_frame, text='Stop', command=self.stop)
         stop_btn.grid(row=0, column=1, padx=10)
+        reset_btn = tk.Button(controls_frame, text='Reset', command=self.reset)
+        reset_btn.grid(row=0, column=2, padx=10)
+
+        self.presets = Presets(self.grid)
+        self.input_preset = tk.StringVar()
+        self.presets_menu = tk.OptionMenu(controls_frame, self.input_preset, *self.presets.options.keys(), command=self.set_preset)
+        self.presets_menu.grid(row=0, column=3, padx=10)
+
+    def set_preset(self, *args):
+        preset_func = self.presets.options[self.input_preset.get()]
+        preset_func()
 
     def play(self, *args):
         self.game_started = True
 
     def stop(self, *args):
         self.game_started = False
+
+    def reset(self, *args):
+        self.grid.reset_grid()
 
 
 class Box:
@@ -126,3 +141,7 @@ class Grid(tk.Canvas):
             for box in self.boxes.values():
                 if box.to_switch: box.switch_state()
         self.root.after(100, self.update_grid)
+
+    def reset_grid(self):
+        for box in self.boxes.values():
+            if box.alive: box.switch_state()
