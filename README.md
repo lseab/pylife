@@ -1,2 +1,5 @@
 # pylife
-Game of Life implemention with python and Tkinter
+
+Python/Tkinter implemention of John Conway's Game of Life.
+
+python main.py
