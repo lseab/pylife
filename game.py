@@ -64,9 +64,9 @@ class Box:
 
     def switch_state(self):
         if self.alive:
-            self.canvas.itemconfigure(self.id, fill="white")
+            self.canvas.itemconfigure(self.id, fill="light gray")
         else:
-            self.canvas.itemconfigure(self.id, fill="black")
+            self.canvas.itemconfigure(self.id, fill="gray40")
         self.alive = not self.alive
         self.to_switch = False
 
@@ -106,7 +106,7 @@ class Grid(tk.Canvas):
                 y1 = row * self.cellheight
                 x2 = x1 + self.cellwidth
                 y2 = y1 + self.cellheight
-                box_id = self.create_rectangle(x1,y1,x2,y2, fill="white")
+                box_id = self.create_rectangle(x1,y1,x2,y2, fill="light gray")
                 self.boxes[row, column] = Box(self, box_id, row, column)
                 self.tag_bind(box_id, "<Button-1>", lambda event, row=row, column=column: self.select_box(self.boxes[row,column]))
 
