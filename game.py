@@ -22,17 +22,20 @@ class GameOfLife(tk.Tk):
     def controls_frame(self):
         controls_frame = tk.Frame(self)
         controls_frame.pack(side="top", pady=20)
-        play_btn = tk.Button(controls_frame, text='Play', command=self.play)
+        on_off_var = tk.StringVar(value=0)
+        play_btn = tk.Radiobutton(controls_frame, text='Play', variable=on_off_var, value=1, indicatoron=False, command=self.play)
         play_btn.grid(row=0, column=0, padx=10)
-        stop_btn = tk.Button(controls_frame, text='Stop', command=self.stop)
+        stop_btn = tk.Radiobutton(controls_frame, text='Stop', variable=on_off_var, value=0, indicatoron=False, command=self.stop)
         stop_btn.grid(row=0, column=1, padx=10)
+        next_btn = tk.Button(controls_frame, text='Next', command=self.next)
+        next_btn.grid(row=0, column=2, padx=10)
         reset_btn = tk.Button(controls_frame, text='Reset', command=self.reset)
-        reset_btn.grid(row=0, column=2, padx=10)
+        reset_btn.grid(row=0, column=3, padx=10)
 
         self.presets = Presets(self.grid)
         self.input_preset = tk.StringVar()
         self.presets_menu = tk.OptionMenu(controls_frame, self.input_preset, *self.presets.options.keys(), command=self.set_preset)
-        self.presets_menu.grid(row=0, column=3, padx=10)
+        self.presets_menu.grid(row=0, column=4, padx=10)
 
     def set_preset(self, *args):
         preset_func = self.presets.options[self.input_preset.get()]
@@ -43,6 +46,9 @@ class GameOfLife(tk.Tk):
 
     def stop(self, *args):
         self.game_started = False
+
+    def next(self, *args):
+        if not self.game_started: self.grid.update_grid()
 
     def reset(self, *args):
         self.grid.reset_grid()
@@ -96,7 +102,7 @@ class Grid(tk.Canvas):
         self.boxes = {}
         self.draw()
         self.bind("<B1-Motion>", self.click_and_drag)
-        self.update_grid()
+        self.time()
 
     def draw(self, event=None):
         # Create boxes
@@ -134,13 +140,15 @@ class Grid(tk.Canvas):
     def select_box(self, box):
         box.switch_state()
     
-    def update_grid(self):        
-        if self.root.game_started:
-            for box in self.boxes.values():
-                box.check_future_state()
-            for box in self.boxes.values():
-                if box.to_switch: box.switch_state()
-        self.root.after(100, self.update_grid)
+    def time(self):
+        if self.root.game_started: self.update_grid()
+        self.root.after(100, self.time)
+
+    def update_grid(self):
+        for box in self.boxes.values():
+            box.check_future_state()
+        for box in self.boxes.values():
+            if box.to_switch: box.switch_state()
 
     def reset_grid(self):
         for box in self.boxes.values():
